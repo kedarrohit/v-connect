@@ -19,6 +19,6 @@ jobs:
 
       - name: Build backend Docker image
         run: |
-          cd server
+          cd Server
           docker build -t v-connect-backend .
 
