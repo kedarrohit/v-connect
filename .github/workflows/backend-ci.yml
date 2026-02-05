@@ -1,4 +1,4 @@
-name: Backend CI (Docker)
+name: Backend CI/CD (Docker)
 
 on:
   push:
@@ -7,18 +7,26 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-backend:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build backend Docker image
-        run: |
-          cd Server
-          docker build -t v-connect-backend .
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./Server
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/v-connect-backend:latest
